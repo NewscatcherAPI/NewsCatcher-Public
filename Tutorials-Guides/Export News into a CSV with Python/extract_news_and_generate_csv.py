@@ -22,7 +22,7 @@ os.chdir('/mnt/c/Users/user_name/PycharmProjects/extract_news_data')
 # URL of our News API
 base_url = 'https://api.newscatcherapi.com/v2/search'
 # Your API key
-X_API_KEY = 'SY_u30SSXaFSRmUQxCyb-3LBerQGdEqw8DYfzQMoXSo'
+X_API_KEY = 'PUT_YOUR_API_KEY'
 
 
 
