@@ -1,0 +1,561 @@
+openapi: 3.0.0
+info:
+  title: NewsCatcher News API V2
+  description: |
+    NewsCatcher is a data-as-a-service startup that has one main goal:
+    to build the largest database of structured news articles published online.
+    In other words, we're like Google for the news part of the web, which you can access as a source of data.
+  version: 1.0.0
+servers:
+- url: https://api.newscatcherapi.com
+paths:
+  /v2/search:
+    get:
+      summary: Search For Specific News Articles
+      description: Main endpoint that allows you to find news article by keyword, date, language, country, etc.
+      parameters:
+        - $ref: "#/components/parameters/apiKey"
+        - $ref: "#/components/parameters/q"
+        - $ref: "#/components/parameters/lang"
+        - $ref: "#/components/parameters/not_lang"
+        - $ref: "#/components/parameters/published_date_precision"
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+        - $ref: "#/components/parameters/search_in"
+        - $ref: "#/components/parameters/countries"
+        - $ref: "#/components/parameters/not_countries"
+        - $ref: "#/components/parameters/topic"
+        - $ref: "#/components/parameters/sources"
+        - $ref: "#/components/parameters/not_sources"
+        - $ref: "#/components/parameters/ranked_only"
+        - $ref: "#/components/parameters/from_rank"
+        - $ref: "#/components/parameters/to_rank"
+        - $ref: "#/components/parameters/sort_by"
+        - $ref: "#/components/parameters/page_size"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+  /v2/latest_headlines:
+    get:
+      summary: Get Latest News Articles
+      description: Get the latest headlines given any topic, country, or language.
+      parameters:
+        - $ref: "#/components/parameters/apiKey"
+        - $ref: "#/components/parameters/lang"
+        - $ref: "#/components/parameters/not_lang"
+        - $ref: "#/components/parameters/countries"
+        - $ref: "#/components/parameters/not_countries"
+        - $ref: "#/components/parameters/topic"
+        - $ref: "#/components/parameters/sources"
+        - $ref: "#/components/parameters/not_sources"
+        - $ref: "#/components/parameters/page_size"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response_latest"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+  /v2/sources:
+    get:
+      summary: Get top news sources supported by NewsCatcher.
+      description: Returns a list of the top 100 supported news websites. Overall, we support over 60,000 websites. Using this endpoint, you may find the top 100 for your specific language, country, topic combination.
+      parameters:
+        - $ref: "#/components/parameters/apiKey"
+        - $ref: "#/components/parameters/lang"
+        - $ref: "#/components/parameters/countries"
+        - $ref: "#/components/parameters/topic"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response_sources"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+components:
+  parameters:
+    apiKey:
+      description: |
+        Your unique authentication token
+      name: x-api-key
+      in: header
+      required: true
+      schema:
+        $ref: "#/components/schemas/stringType"
+    q:
+      description: |
+        Keyword/keywords you're searching for. This is the most important part of your query.
+        Please, refer to the **Advanced Query Parameter** section below for more examples and explanations.
+      name: q
+      in: query
+      required: true
+      schema:
+        $ref: "#/components/schemas/qStringType"
+    lang:
+      description: |
+        Specifies the languages of the search. For example: `en`.
+        The only accepted format is [ISO 639-1 — 2](https://en.wikipedia.org/wiki/ISO_639-1) letter code.
+      name: lang
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/langType"
+    not_lang:
+      description: |
+        Inverse to the `lang` parameter
+      name: not_lang
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/langType"
+    published_date_precision:
+      description: |
+        There are 3 types of date precision we define:
+        `full` — day and time of an article is correctly identified with the appropriate timezone
+        `timezone unknown` — day and time of an article is correctly identified without timezone
+        `date` — only the day is identified without an exact time
+      name: published_date_precision
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/datePrecisionType"
+    from:
+      description: |
+        `YYYY/mm/dd` From which point in time to start the search.
+        The default timezone is UTC.
+        Defaults to the past week.
+      name: from
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/dateType"
+    to:
+      description: |
+        `YYYY/mm/dd` Until which point in time to search for.
+        The default timezone is UTC.
+      name: to
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/dateType"
+    search_in:
+      description: |
+        By default, we search what you specified in the `q` parameter in both `title` and `summary` of the article.
+        However, you can limit this to either `title` or `summary`
+      name: search_in
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/searchInType"
+    countries:
+      description: |
+        Countries where the news publisher is located.
+        **Important**: This parameter is not responsible for the countries mentioned in the news article.
+        One or multiple countries can be used in the search.
+        The only acceptable format is [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+        For example, `US,CA,MX` or just `US`
+      name: countries
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/countriesType"
+    not_countries:
+      description: |
+        The inverse of the `countries` parameter.
+      name: not_countries
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/countriesType"
+    topic:
+      description: |
+        Accepted values: `news`, `sport`, `tech`, `world`, `finance`, `politics`, `business`, `economics`, `entertainment`, `beauty`, `travel`, `music`, `food`, `science`, `gaming`
+        The topic to which you want to restrict the articles of your choice.
+        Not all news articles are assigned with a topic, therefore, we cannot guarantee that 100% of topics talking about technology will be assigned a tech label.
+      name: topic
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/topicType"
+    sources:
+      description: |
+        One or more news resources to filter your search. It should be the normal form of the URL,
+        For example: `nytimes.com,theguardian.com`
+      name: sources
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sourcesType"
+    not_sources:
+      description: |
+        One or more sources to be excluded from the search.
+        Comma-separated list. For example: `nytimes.com,cnn.com,wsj.com`
+      name: not_sources
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sourcesType"
+    ranked_only:
+      description: |
+        Default: `True`
+        Limit the search only for the sources which are in the top 1 million online websites. Unranked sources are assigned a rank that equals `999999`
+      name: ranked_only
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/rankedOnlyType"
+    from_rank:
+      description: |
+        `[0:999999]` The lowest boundary of the rank of a news website to filter by.
+        Important: lower rank means that a source is more popular
+      name: from_rank
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/rankType"
+    to_rank:
+      description: |
+        `[0:999999]` The upper boundary of the rank of a news website to filter by.
+      name: to_rank
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/rankType"
+    sort_by:
+      description: |
+        `relevancy` (default value) — the most relevant results first
+        `date` — the most recently published results first
+        `rank` — the results from the highest-ranked sources first
+      name: sort_by
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sortByType"
+    page_size:
+      description: |
+        `[1:100]` How many articles to return per page.
+      name: page_size
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/pageSizeType"
+    page:
+      description: |
+        The number of the page. Use it to scroll through the results.
+        This parameter is used to paginate: scroll through results because one API response cannot return more than 100 articles.
+      name: page
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/pageType"
+  schemas:
+    qStringType:
+      type: string
+      example: "\"Elon Musk\""
+    langType:
+      type: string
+      enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+      example: "en"
+    datePrecisionType:
+      type: string
+      enum: ["full", "timezone unknown", "date"]
+      example: "full"
+    dateType:
+      type: string
+      example: "2021/05/06"
+    searchInType:
+      type: string
+      enum: ["title", "summary", "title_summary"]
+      example: "title"
+    countriesType:
+      type: string
+      example: "US,CA"
+    topicType:
+      type: string
+      enum: ["news", "sport", "tech", "world", "finance", "politics", "business", "economics", "entertainment", "beauty", "travel", "music", "food", "science", "gaming"]
+      example: "business"
+    sourcesType:
+      type: string
+      example: "nytimes.com,theguardian.com"
+    rankedOnlyType:
+      type: boolean
+      example: true
+    rankType:
+      type: integer
+      minimum: 1
+      maximum: 999999
+      example: 1000
+    sortByType:
+      type: string
+      enum: ["relevancy", "date", "rank"]
+      example: "rank"
+    pageSizeType:
+      type: integer
+      minimum: 1
+      maximum: 100
+      example: 100
+    pageType:
+      type: integer
+      minimum: 1
+      example: 1
+    # Response parameters
+    statusType:
+      type: string
+      enum: ["OK", "error"]
+      example: "OK"
+    statusType2:
+      type: string
+      enum: ["OK", "error"]
+      example: "error"
+    integerType:
+      type: integer
+    stringType:
+      type: string
+    listType:
+      type: array
+      items:
+        type: string
+    booleanType:
+      type: boolean
+    floatType:
+      type: number
+    articleType:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            $ref: "#/components/schemas/stringType"
+          author:
+            $ref: "#/components/schemas/stringType"
+          published_date:
+            $ref: "#/components/schemas/stringType"
+          published_date_precision:
+            $ref: "#/components/schemas/stringType"
+          link:
+            $ref: "#/components/schemas/stringType"
+          clean_url:
+            $ref: "#/components/schemas/stringType"
+          excerpt:
+            $ref: "#/components/schemas/stringType"
+          summary:
+            $ref: "#/components/schemas/stringType"
+          rights:
+            $ref: "#/components/schemas/stringType"
+          rank:
+            $ref: "#/components/schemas/integerType"
+          topic:
+            $ref: "#/components/schemas/stringType"
+          country:
+            $ref: "#/components/schemas/stringType"
+          language:
+            $ref: "#/components/schemas/stringType"
+          authors:
+            $ref: "#/components/schemas/listType"
+          is_opinion:
+            $ref: "#/components/schemas/booleanType"
+          twitter_account:
+            $ref: "#/components/schemas/stringType"
+          _score:
+            $ref: "#/components/schemas/floatType"
+          _id:
+            $ref: "#/components/schemas/stringType"
+    userInputType:
+      type: object
+      properties:
+        q:
+          $ref: "#/components/schemas/stringType"
+        search_in:
+          $ref: "#/components/schemas/listType"
+        lang:
+          $ref: "#/components/schemas/listType"
+        not_lang:
+          $ref: "#/components/schemas/listType"
+        countries:
+          $ref: "#/components/schemas/listType"
+        not_countries:
+          $ref: "#/components/schemas/listType"
+        from:
+          $ref: "#/components/schemas/stringType"
+        to:
+          $ref: "#/components/schemas/stringType"
+        ranked_only:
+          $ref: "#/components/schemas/stringType"
+        from_rank:
+          $ref: "#/components/schemas/integerType"
+        to_rank:
+          $ref: "#/components/schemas/integerType"
+        sort_by:
+          $ref: "#/components/schemas/stringType"
+        page:
+          $ref: "#/components/schemas/integerType"
+        size:
+          $ref: "#/components/schemas/integerType"
+        sources:
+          $ref: "#/components/schemas/listType"
+        not_sources:
+          $ref: "#/components/schemas/listType"
+        topic:
+          $ref: "#/components/schemas/stringType"
+        published_date_precision:
+          $ref: "#/components/schemas/stringType"
+    userInputLatestType:
+      type: object
+      properties:
+        lang:
+          $ref: "#/components/schemas/listType"
+        not_lang:
+          $ref: "#/components/schemas/listType"
+        countries:
+          $ref: "#/components/schemas/listType"
+        not_countries:
+          $ref: "#/components/schemas/listType"
+        page:
+          $ref: "#/components/schemas/integerType"
+        size:
+          $ref: "#/components/schemas/integerType"
+        sources:
+          $ref: "#/components/schemas/listType"
+        not_sources:
+          $ref: "#/components/schemas/listType"
+        topic:
+          $ref: "#/components/schemas/stringType"
+    userInputSourcesType:
+      type: object
+      properties:
+        lang:
+          $ref: "#/components/schemas/listType"
+        countries:
+          $ref: "#/components/schemas/listType"
+        topic:
+          $ref: "#/components/schemas/stringType"
+    200_response:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/statusType"
+        total_hits:
+          $ref: "#/components/schemas/integerType"
+        page:
+          $ref: "#/components/schemas/integerType"
+        total_pages:
+          $ref: "#/components/schemas/integerType"
+        page_size:
+          $ref: "#/components/schemas/integerType"
+        articles:
+          $ref: "#/components/schemas/articleType"
+        user_input:
+          $ref: "#/components/schemas/userInputType"
+    200_response_latest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/statusType"
+        total_hits:
+          $ref: "#/components/schemas/integerType"
+        page:
+          $ref: "#/components/schemas/integerType"
+        total_pages:
+          $ref: "#/components/schemas/integerType"
+        page_size:
+          $ref: "#/components/schemas/integerType"
+        articles:
+          $ref: "#/components/schemas/articleType"
+        user_input:
+          $ref: "#/components/schemas/userInputLatestType"
+    200_response_sources:
+      type: object
+      properties:
+        message:
+          $ref: "#/components/schemas/listType"
+        sources:
+          $ref: "#/components/schemas/stringType"
+        user_input:
+          $ref: "#/components/schemas/userInputSourcesType"
+    error_response:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/statusType2"
+        error_code:
+          $ref: "#/components/schemas/stringType"
+        message:
+          $ref: "#/components/schemas/stringType"
