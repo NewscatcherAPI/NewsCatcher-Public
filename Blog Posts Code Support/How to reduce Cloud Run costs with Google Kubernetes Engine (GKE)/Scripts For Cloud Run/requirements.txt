@@ -1,0 +1,4 @@
+flask==1.1.1
+Flask-Cors==3.0.10
+Flask-SSLify==0.1.5
+google-cloud-pubsub==2.4.0
