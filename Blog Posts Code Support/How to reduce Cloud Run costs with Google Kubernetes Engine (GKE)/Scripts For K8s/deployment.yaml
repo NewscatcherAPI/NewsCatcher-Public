@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extractor-article
+  labels:
+    app: extractor-article
+spec:
+  replicas: 180 # (1)
+  selector:
+    matchLabels:
+      app: extractor-article
+  template:
+    metadata:
+      labels:
+        app:  extractor-article
+    spec:
+      containers:
+      - name: extractor-article-container
+        image: gcr.io/my_project-3051257/article-extractor@sha256:75bbebdfgb451e3a301fe9dd2cf1facsdfdsf445164cdd2fd0462b78781 # (2)
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        resources:
+          requests: # (3)
+            memory: "256Mi"
+            cpu: "150m"
+          limits: # (4)
+            memory: "512Mi"
+            cpu: "250m"
+        env: # (5)
+          - name: VARIABLE_1
+            value: "abc"
+          - name: VARIABLE_2
+            value: "60"
+          - name: PROJECT_ID
+            value: "my_project-3051257"
+          - name: TOPIC_ID
+            value: "postextraction-queue"
+          - name: SUBSRIPTION_ID
+            value: "preextraction-sub"
+          - name: TIMEOUT
+            value: "60"
+          - name: MAX_SENT
+            value: "10"
