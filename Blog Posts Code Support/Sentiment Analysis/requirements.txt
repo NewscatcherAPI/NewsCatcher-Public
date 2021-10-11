@@ -1,0 +1,6 @@
+tweepy==3.10.0
+nltk==3.6.3
+wordcloud==1.7.0
+transformers[torch]==4.10.2
+plotly==5.3.1
+pandas==1.0.3
