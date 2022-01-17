@@ -242,7 +242,7 @@ tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 
 model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
 
-nlp = pipeline("sentiment-analysis", model = model, tokenizer = tokenizer)
+nlp = pipeline("sentiment-analysis", model = model, tokenizer=tokenizer)
 
 
 possible_sentiments = ['negative', 'neutral', 'positive']
