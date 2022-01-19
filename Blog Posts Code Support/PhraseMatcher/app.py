@@ -119,7 +119,8 @@ else:
                     if count == 1:
                         plot_data['ents'].append(matches[text])
 
-        
+            plot_data['ents'] = sorted(plot_data['ents'], key = lambda ent: ent['start'])
+
             st.markdown("### Labeled Data")
             html = displacy.render(plot_data , style="ent", options=options, manual=True, page =True)
             components.html(html, height = 500, scrolling  = True)
