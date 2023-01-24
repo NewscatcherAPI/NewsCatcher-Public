@@ -40,8 +40,8 @@ paths:
        - search
       summary: Search for specific news articles
       description: Main endpoint that allows you to find news article by keyword, date, language, country, etc.
+      operationId: Search_get
       parameters:
-        - $ref: "#/components/parameters/api_key"
         - $ref: "#/components/parameters/q"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/not_lang"
@@ -104,6 +104,7 @@ paths:
        - search
       summary: Search for specific news articles
       description: Main endpoint that allows you to find news article by keyword, date, language, country, etc.
+      operationId: Search_post
       requestBody:
         content:
           application/json:
@@ -154,8 +155,8 @@ paths:
        - latest_headlines
       summary: Get Latest News Articles
       description: Get the latest headlines given any topic, country, or language.
+      operationId: Latest_headlines_get
       parameters:
-        - $ref: "#/components/parameters/api_key"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/not_lang"
         - $ref: "#/components/parameters/countries"
@@ -203,11 +204,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
     post:
       tags:
        - latest_headlines
       summary: Get Latest News Articles
       description: Get the latest headlines given any topic, country, or language.
+      operationId: Latest_headlines_post
       requestBody:
         content:
           application/json:
@@ -250,14 +254,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
   /sources:
     get:
       tags:
       - sources
       summary: Get top news sources supported by NewsCatcher.
       description: Returns a list of the top 100 supported news websites. Overall, we support over 60,000 websites. Using this endpoint, you may find the top 100 for your specific language, country, topic combination.
+      operationId: Sources_get
       parameters:
-        - $ref: "#/components/parameters/api_key"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/countries"
         - $ref: "#/components/parameters/topic"
@@ -298,11 +304,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
     post:
       tags:
       - sources
       summary: Get top news sources supported by NewsCatcher.
       description: Returns a list of the top 100 supported news websites. Overall, we support over 60,000 websites. Using this endpoint, you may find the top 100 for your specific language, country, topic combination.
+      operationId: Sources_post
       requestBody:
         content:
           application/json:
@@ -345,6 +354,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
 components:
   parameters:
     api_key:
