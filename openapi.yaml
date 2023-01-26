@@ -155,7 +155,7 @@ paths:
        - latest_headlines
       summary: Get Latest News Articles
       description: Get the latest headlines given any topic, country, or language.
-      operationId: Latest_headlines_get
+      operationId: LatestHeadlines_get
       parameters:
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/not_lang"
@@ -211,7 +211,7 @@ paths:
        - latest_headlines
       summary: Get Latest News Articles
       description: Get the latest headlines given any topic, country, or language.
-      operationId: Latest_headlines_post
+      operationId: LatestHeadlines_post
       requestBody:
         content:
           application/json:
@@ -316,7 +316,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Sources'
+              $ref: '#/components/schemas/SourcesQuery'
       responses:
         "200":
           description: "OK"
@@ -614,7 +614,7 @@ components:
           type: integer
           minimum: 1
           example: 1
-    Sources:
+    SourcesQuery:
       type: object
       properties:
         lang:
@@ -726,16 +726,17 @@ components:
     # Response parameters
     success_status:
       type: string
-      enum: ["OK", "error"]
-      example: "OK"
+      enum: ["ok", "error"]
+      example: "ok"
     error_status:
       type: string
-      enum: ["OK", "error"]
+      enum: ["ok", "error"]
       example: "error"
     list:
       type: array
       items:
         type: string
+      nullable: true
     article:
       type: array
       items:
@@ -767,14 +768,17 @@ components:
             type: string
           language:
             type: string
+            nullable: true
           authors:
-            $ref: "#/components/schemas/list"
+            type: string
           is_opinion:
             type: boolean
           twitter_account:
             type: string
+            nullable: true
           _score:
             type: number
+            nullable: true
           _id:
             type: string
     search_user_input:
@@ -796,12 +800,15 @@ components:
           type: string
         to:
           type: string
+          nullable: true
         ranked_only:
           type: string
         from_rank:
           type: integer
+          nullable: true
         to_rank:
           type: integer
+          nullable: true
         sort_by:
           type: string
         page:
@@ -814,8 +821,10 @@ components:
           $ref: "#/components/schemas/list"
         topic:
           type: string
+          nullable: true
         published_date_precision:
           type: string
+          nullable: true
     latest_headlines_user_input:
       type: object
       properties:
@@ -837,6 +846,7 @@ components:
           $ref: "#/components/schemas/list"
         topic:
           type: string
+          nullable: true
     sources_user_input:
       type: object
       properties:
@@ -846,6 +856,7 @@ components:
           $ref: "#/components/schemas/list"
         topic:
           type: string
+          nullable: true
     200_response:
       type: object
       properties:
@@ -884,9 +895,9 @@ components:
       type: object
       properties:
         message:
-          $ref: "#/components/schemas/list"
-        sources:
           type: string
+        sources:
+          $ref: "#/components/schemas/list"
         user_input:
           $ref: "#/components/schemas/sources_user_input"
     error_response:
