@@ -482,7 +482,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/sources"
+        $ref: "#/components/schemas/not_sources"
     ranked_only:
       description: |
         Default: `True`
@@ -699,6 +699,9 @@ components:
     sources:
       type: string
       example: "nytimes.com,theguardian.com"
+    not_sources:
+      type: string
+      example: "wsj.com"
     ranked_only:
       type: boolean
       example: true
@@ -726,11 +729,11 @@ components:
     # Response parameters
     success_status:
       type: string
-      enum: ["ok", "error"]
+      enum: ["ok", "No matches for your search."]
       example: "ok"
     error_status:
       type: string
-      enum: ["ok", "error"]
+      enum: ["error", "No matches for your search."]
       example: "error"
     list:
       type: array
