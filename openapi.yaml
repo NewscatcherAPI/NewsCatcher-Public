@@ -1,20 +1,47 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: NewsCatcher News API V2
   description: |
     NewsCatcher is a data-as-a-service startup that has one main goal:
     to build the largest database of structured news articles published online.
     In other words, we're like Google for the news part of the web, which you can access as a source of data.
-  version: 1.0.0
+    
+    Some useful links:
+    - [How NewsCatcher Works](https://docs.newscatcherapi.com/knowledge-base/how-newscatcher-works)
+    - [GitHub for the Python SDK](https://github.com/NewscatcherAPI/newscatcherapi-sdk-python)
+  contact:
+    email: team@newscatcherapi.com
+  version: 1.0.1
+externalDocs:
+  description: Find out more about NewsCatcher
+  url: https://docs.newscatcherapi.com/
 servers:
-- url: https://api.newscatcherapi.com
+- url: https://api.newscatcherapi.com/v2
+tags:
+  - name: search
+    description: Search for specific news articles
+    externalDocs:
+      description: Find out more about searching news articles
+      url: https://docs.newscatcherapi.com/api-docs/endpoints/search-news
+  - name: latest_headlines
+    description: Get lastest news articles 
+    externalDocs:
+      description: Find out more about getting the latest news articles
+      url: https://docs.newscatcherapi.com/api-docs/endpoints/latest-headlines
+  - name: sources
+    description: Get the list of top news sources supported by NewsCatcher.
+    externalDocs:
+      description: Find out more about getting a list of sources
+      url: https://docs.newscatcherapi.com/api-docs/endpoints/sources
 paths:
-  /v2/search:
+  /search:
     get:
-      summary: Search For Specific News Articles
+      tags:
+       - search
+      summary: Search for specific news articles
       description: Main endpoint that allows you to find news article by keyword, date, language, country, etc.
+      operationId: Search_get
       parameters:
-        - $ref: "#/components/parameters/apiKey"
         - $ref: "#/components/parameters/q"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/not_lang"
@@ -70,12 +97,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-  /v2/latest_headlines:
+      security:
+        - api_key: []
+    post:
+      tags:
+       - search
+      summary: Search for specific news articles
+      description: Main endpoint that allows you to find news article by keyword, date, language, country, etc.
+      operationId: Search_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Search'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "408":
+          description: "Request Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
+  /latest_headlines:
     get:
+      tags:
+       - latest_headlines
       summary: Get Latest News Articles
       description: Get the latest headlines given any topic, country, or language.
+      operationId: LatestHeadlines_get
       parameters:
-        - $ref: "#/components/parameters/apiKey"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/not_lang"
         - $ref: "#/components/parameters/countries"
@@ -123,12 +204,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-  /v2/sources:
+      security:
+        - api_key: []
+    post:
+      tags:
+       - latest_headlines
+      summary: Get Latest News Articles
+      description: Get the latest headlines given any topic, country, or language.
+      operationId: LatestHeadlines_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/latestHeadlines'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response_latest"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "408":
+          description: "Request Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
+  /sources:
     get:
+      tags:
+      - sources
       summary: Get top news sources supported by NewsCatcher.
       description: Returns a list of the top 100 supported news websites. Overall, we support over 60,000 websites. Using this endpoint, you may find the top 100 for your specific language, country, topic combination.
+      operationId: Sources_get
       parameters:
-        - $ref: "#/components/parameters/apiKey"
         - $ref: "#/components/parameters/lang"
         - $ref: "#/components/parameters/countries"
         - $ref: "#/components/parameters/topic"
@@ -169,25 +304,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
+    post:
+      tags:
+      - sources
+      summary: Get top news sources supported by NewsCatcher.
+      description: Returns a list of the top 100 supported news websites. Overall, we support over 60,000 websites. Using this endpoint, you may find the top 100 for your specific language, country, topic combination.
+      operationId: Sources_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourcesQuery'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/200_response_sources"
+        "400":
+          description: "API is not put in headers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "401":
+          description: "API Key not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "406":
+          description: "Wrong parameter has been used"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "408":
+          description: "Request Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "429":
+          description: "Concurrency violated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+      security:
+        - api_key: []
 components:
   parameters:
-    apiKey:
+    api_key:
       description: |
         Your unique authentication token
       name: x-api-key
       in: header
       required: true
       schema:
-        $ref: "#/components/schemas/stringType"
+        type: string
     q:
       description: |
         Keyword/keywords you're searching for. This is the most important part of your query.
-        Please, refer to the **Advanced Query Parameter** section below for more examples and explanations.
+        Please, refer to the **Advanced Query Parameter** section below of the docs for more examples and explanations
       name: q
       in: query
       required: true
       schema:
-        $ref: "#/components/schemas/qStringType"
+        type: string
+        example: '"Elon Musk"'
     lang:
       description: |
         Specifies the languages of the search. For example: `en`.
@@ -196,7 +384,9 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/langType"
+        type: string
+        enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+        example: "en"
     not_lang:
       description: |
         Inverse to the `lang` parameter
@@ -204,7 +394,8 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/langType"
+        type: string
+        enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
     published_date_precision:
       description: |
         There are 3 types of date precision we define:
@@ -215,7 +406,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/datePrecisionType"
+        $ref: "#/components/schemas/publish_date_precision"
     from:
       description: |
         `YYYY/mm/dd` From which point in time to start the search.
@@ -225,7 +416,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/dateType"
+        $ref: "#/components/schemas/date"
     to:
       description: |
         `YYYY/mm/dd` Until which point in time to search for.
@@ -234,7 +425,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/dateType"
+        $ref: "#/components/schemas/date"
     search_in:
       description: |
         By default, we search what you specified in the `q` parameter in both `title` and `summary` of the article.
@@ -243,7 +434,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/searchInType"
+        $ref: "#/components/schemas/search_in"
     countries:
       description: |
         Countries where the news publisher is located.
@@ -255,7 +446,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/countriesType"
+        $ref: "#/components/schemas/countries"
     not_countries:
       description: |
         The inverse of the `countries` parameter.
@@ -263,7 +454,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/countriesType"
+        $ref: "#/components/schemas/countries"
     topic:
       description: |
         Accepted values: `news`, `sport`, `tech`, `world`, `finance`, `politics`, `business`, `economics`, `entertainment`, `beauty`, `travel`, `music`, `food`, `science`, `gaming`
@@ -273,7 +464,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/topicType"
+        $ref: "#/components/schemas/topic"
     sources:
       description: |
         One or more news resources to filter your search. It should be the normal form of the URL,
@@ -282,7 +473,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/sourcesType"
+        $ref: "#/components/schemas/sources"
     not_sources:
       description: |
         One or more sources to be excluded from the search.
@@ -291,7 +482,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/sourcesType"
+        $ref: "#/components/schemas/not_sources"
     ranked_only:
       description: |
         Default: `True`
@@ -300,7 +491,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/rankedOnlyType"
+        $ref: "#/components/schemas/ranked_only"
     from_rank:
       description: |
         `[0:999999]` The lowest boundary of the rank of a news website to filter by.
@@ -309,7 +500,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/rankType"
+        $ref: "#/components/schemas/rank"
     to_rank:
       description: |
         `[0:999999]` The upper boundary of the rank of a news website to filter by.
@@ -317,7 +508,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/rankType"
+        $ref: "#/components/schemas/rank"
     sort_by:
       description: |
         `relevancy` (default value) — the most relevant results first
@@ -327,7 +518,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/sortByType"
+        $ref: "#/components/schemas/sort_by"
     when:
       description: |
         The time period you want to get the latest headlines for.
@@ -341,7 +532,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/whenType"
+        $ref: "#/components/schemas/when"
     page_size:
       description: |
         `[1:100]` How many articles to return per page.
@@ -349,7 +540,7 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/pageSizeType"
+        $ref: "#/components/schemas/page_size"
     page:
       description: |
         The number of the page. Use it to scroll through the results.
@@ -358,240 +549,371 @@ components:
       in: query
       required: false
       schema:
-        $ref: "#/components/schemas/pageType"
+        $ref: "#/components/schemas/page"
   schemas:
-    qStringType:
+    Search:
+      type: object
+      properties:
+        q:
+          type: string
+          description:  Keyword/keywords you're searching for. This is the most important part of your query. Please, refer to the **Advanced Query Parameter** section of the docs for more examples and explanations.
+          example: '"Elon Musk"'
+        lang:
+          type: string
+          description: The language you want to search in. 
+          enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+          example: "en"
+        not_lang:
+          type: string
+          description: Inverse to the lang parameter. 
+          enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+        published_date_precision:
+          type: string
+          description: Precision of the publication date.
+          enum: ["full", "timezone unknown", "date"]
+          example: "full"
+        from:
+          type: string
+          description: YYYY/mm/dd From which point in time to start the search. The default timezone is UTC.  Defaults to the past week.
+          example: "2021/05/06"
+        to:
+          type: string
+          description: YYYY/mm/dd Until which point in time to search for. The default timezone is UTC.
+          example: "2021/05/06"
+        search_in:
+          type: string
+          enum: ["title", "summary", "title_summary"]
+          example: "title"
+        countries:
+          type: string
+          example: "US,CA"
+        not_countries:
+          type: string
+        topic:
+          type: string
+          enum: ["news", "sport", "tech", "world", "finance", "politics", "business", "economics", "entertainment", "beauty", "travel", "music", "food", "science", "gaming"]
+          example: "business"
+        sources:
+          type: string
+          example: "nytimes.com,theguardian.com"
+        not_sources:
+          type: string
+        ranked_only:
+          type: boolean
+          example: true
+        sort_by:
+          type: string
+          enum: ["relevancy", "date", "rank"]
+          example: "rank"
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 100
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+    SourcesQuery:
+      type: object
+      properties:
+        lang:
+          type: string
+          description: The language you want to search in. 
+          enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+          example: "en"
+        countries:
+          type: string
+          example: "US,CA"
+        topic:
+          type: string
+          enum: ["news", "sport", "tech", "world", "finance", "politics", "business", "economics", "entertainment", "beauty", "travel", "music", "food", "science", "gaming"]
+          example: "business"
+    latestHeadlines:
+      type: object
+      properties:
+        when:
+          type: string
+          example: "24h"
+        lang:
+          type: string
+          description: The language you want to search in. 
+          enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
+          example: "en"
+        countries:
+          type: string
+          example: "US,CA"
+        not_countries:
+          type: string
+        topic:
+          type: string
+          enum: ["news", "sport", "tech", "world", "finance", "politics", "business", "economics", "entertainment", "beauty", "travel", "music", "food", "science", "gaming"]
+          example: "business"
+        sources:
+          type: string
+          example: "nytimes.com,theguardian.com"
+        not_sources:
+          type: string
+        ranked_only:
+          type: boolean
+          example: true
+        sort_by:
+          type: string
+          enum: ["relevancy", "date", "rank"]
+          example: "rank"
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 100
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        
+    q:
       type: string
       example: "\"Elon Musk\""
-    langType:
+    lang:
       type: string
       enum: ["af", "ar", "bg", "bn", "ca", "cn", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "tw", "uk", "ur", "vi"]
       example: "en"
-    datePrecisionType:
+    publish_date_precision:
       type: string
       enum: ["full", "timezone unknown", "date"]
       example: "full"
-    dateType:
+    date:
       type: string
       example: "2021/05/06"
-    searchInType:
+    search_in:
       type: string
       enum: ["title", "summary", "title_summary"]
       example: "title"
-    countriesType:
+    countries:
       type: string
       example: "US,CA"
-    topicType:
+    topic:
       type: string
       enum: ["news", "sport", "tech", "world", "finance", "politics", "business", "economics", "entertainment", "beauty", "travel", "music", "food", "science", "gaming"]
       example: "business"
-    sourcesType:
+    sources:
       type: string
       example: "nytimes.com,theguardian.com"
-    rankedOnlyType:
+    not_sources:
+      type: string
+      example: "wsj.com"
+    ranked_only:
       type: boolean
       example: true
-    rankType:
+    rank:
       type: integer
       minimum: 1
       maximum: 999999
       example: 1000
-    sortByType:
+    sort_by:
       type: string
       enum: ["relevancy", "date", "rank"]
       example: "rank"
-    whenType:
+    when:
       type: string
       example: "24h"
-    pageSizeType:
+    page_size:
       type: integer
       minimum: 1
       maximum: 100
       example: 100
-    pageType:
+    page:
       type: integer
       minimum: 1
       example: 1
     # Response parameters
-    statusType:
+    success_status:
       type: string
-      enum: ["OK", "error"]
-      example: "OK"
-    statusType2:
+      enum: ["ok", "No matches for your search."]
+      example: "ok"
+    error_status:
       type: string
-      enum: ["OK", "error"]
+      enum: ["error", "No matches for your search."]
       example: "error"
-    integerType:
-      type: integer
-    stringType:
-      type: string
-    listType:
+    list:
       type: array
       items:
         type: string
-    booleanType:
-      type: boolean
-    floatType:
-      type: number
-    articleType:
+      nullable: true
+    article:
       type: array
       items:
         type: object
         properties:
           title:
-            $ref: "#/components/schemas/stringType"
+            type: string
           author:
-            $ref: "#/components/schemas/stringType"
+            type: string
           published_date:
-            $ref: "#/components/schemas/stringType"
+            type: string
           published_date_precision:
-            $ref: "#/components/schemas/stringType"
+            type: string
           link:
-            $ref: "#/components/schemas/stringType"
+            type: string
           clean_url:
-            $ref: "#/components/schemas/stringType"
+            type: string
           excerpt:
-            $ref: "#/components/schemas/stringType"
+            type: string
           summary:
-            $ref: "#/components/schemas/stringType"
+            type: string
           rights:
-            $ref: "#/components/schemas/stringType"
+            type: string
           rank:
-            $ref: "#/components/schemas/integerType"
+            type: integer
           topic:
-            $ref: "#/components/schemas/stringType"
+            type: string
           country:
-            $ref: "#/components/schemas/stringType"
+            type: string
           language:
-            $ref: "#/components/schemas/stringType"
+            type: string
+            nullable: true
           authors:
-            $ref: "#/components/schemas/listType"
+            type: string
           is_opinion:
-            $ref: "#/components/schemas/booleanType"
+            type: boolean
           twitter_account:
-            $ref: "#/components/schemas/stringType"
+            type: string
+            nullable: true
           _score:
-            $ref: "#/components/schemas/floatType"
+            type: number
+            nullable: true
           _id:
-            $ref: "#/components/schemas/stringType"
-    userInputType:
+            type: string
+    search_user_input:
       type: object
       properties:
         q:
-          $ref: "#/components/schemas/stringType"
+          type: string
         search_in:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         lang:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_lang:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         countries:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_countries:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         from:
-          $ref: "#/components/schemas/stringType"
+          type: string
         to:
-          $ref: "#/components/schemas/stringType"
+          type: string
+          nullable: true
         ranked_only:
-          $ref: "#/components/schemas/stringType"
+          type: string
         from_rank:
-          $ref: "#/components/schemas/integerType"
+          type: integer
+          nullable: true
         to_rank:
-          $ref: "#/components/schemas/integerType"
+          type: integer
+          nullable: true
         sort_by:
-          $ref: "#/components/schemas/stringType"
+          type: string
         page:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         size:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         sources:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_sources:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         topic:
-          $ref: "#/components/schemas/stringType"
+          type: string
+          nullable: true
         published_date_precision:
-          $ref: "#/components/schemas/stringType"
-    userInputLatestType:
+          type: string
+          nullable: true
+    latest_headlines_user_input:
       type: object
       properties:
         lang:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_lang:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         countries:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_countries:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         page:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         size:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         sources:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         not_sources:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         topic:
-          $ref: "#/components/schemas/stringType"
-    userInputSourcesType:
+          type: string
+          nullable: true
+    sources_user_input:
       type: object
       properties:
         lang:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         countries:
-          $ref: "#/components/schemas/listType"
+          $ref: "#/components/schemas/list"
         topic:
-          $ref: "#/components/schemas/stringType"
+          type: string
+          nullable: true
     200_response:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/statusType"
+          $ref: "#/components/schemas/success_status"
         total_hits:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         page:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         total_pages:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         page_size:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         articles:
-          $ref: "#/components/schemas/articleType"
+          $ref: "#/components/schemas/article"
         user_input:
-          $ref: "#/components/schemas/userInputType"
+          $ref: "#/components/schemas/search_user_input"
     200_response_latest:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/statusType"
+          $ref: "#/components/schemas/success_status"
         total_hits:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         page:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         total_pages:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         page_size:
-          $ref: "#/components/schemas/integerType"
+          type: integer
         articles:
-          $ref: "#/components/schemas/articleType"
+          $ref: "#/components/schemas/article"
         user_input:
-          $ref: "#/components/schemas/userInputLatestType"
+          $ref: "#/components/schemas/latest_headlines_user_input"
     200_response_sources:
       type: object
       properties:
         message:
-          $ref: "#/components/schemas/listType"
+          type: string
         sources:
-          $ref: "#/components/schemas/stringType"
+          $ref: "#/components/schemas/list"
         user_input:
-          $ref: "#/components/schemas/userInputSourcesType"
+          $ref: "#/components/schemas/sources_user_input"
     error_response:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/statusType2"
+          $ref: "#/components/schemas/error_status"
         error_code:
-          $ref: "#/components/schemas/stringType"
+          type: string
         message:
-          $ref: "#/components/schemas/stringType"
+          type: string
+  securitySchemes:
+      api_key:
+        type: apiKey
+        name: x-api-key
+        in: header
