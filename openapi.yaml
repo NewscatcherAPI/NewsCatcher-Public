@@ -627,7 +627,7 @@ components:
           type: integer
           minimum: 1
           example: 1
-    Sources:
+    SourcesQuery:
       type: object
       properties:
         lang:
