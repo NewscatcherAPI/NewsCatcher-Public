@@ -601,6 +601,19 @@ components:
         ranked_only:
           type: boolean
           example: true
+        from_rank:
+          description: |
+            `[0:999999]` The lowest boundary of the rank of a news website to filter by.
+            Important: lower rank means that a source is more popular
+          type: integer
+          minimum: 0
+          maximum: 999999
+        to_rank:
+          description: |
+            `[0:999999]` The upper boundary of the rank of a news website to filter by.
+          type: integer
+          minimum: 0
+          maximum: 999999
         sort_by:
           type: string
           enum: ["relevancy", "date", "rank"]
@@ -634,7 +647,12 @@ components:
       properties:
         when:
           type: string
-          example: "24h"
+          description: |
+            The time period you want to get the headlines for.
+            Accpeted format:
+            - `7d` -> Daily form, last 7 days time period
+            - `6h` -> Hourly form, last six hours
+          example: "12h"
         lang:
           type: string
           description: The language you want to search in. 
@@ -654,13 +672,10 @@ components:
           example: "nytimes.com,theguardian.com"
         not_sources:
           type: string
+          example: "wsj.com"
         ranked_only:
           type: boolean
           example: true
-        sort_by:
-          type: string
-          enum: ["relevancy", "date", "rank"]
-          example: "rank"
         page_size:
           type: integer
           minimum: 1
