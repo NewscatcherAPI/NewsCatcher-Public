@@ -779,6 +779,7 @@ components:
             type: string
           rights:
             type: string
+            nullable: true
           rank:
             type: integer
           topic:
